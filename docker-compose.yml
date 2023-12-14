@@ -1,0 +1,94 @@
+version: "3.8"
+services: 
+    
+    #==============================================>> Database
+    mysql: 
+        image: mysql:5.7.36
+        container_name: db
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "5009:3306"
+        environment:
+            MYSQL_DATABASE: homestead
+            MYSQl_USER: homestead
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: secret
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - ./db/mysql:/var/lib/mysql
+        networks:
+            - camcyber
+
+    #==============================================>> API
+    api: 
+        container_name: pos-api-v1  
+        restart: unless-stopped
+        tty: true
+        build: 
+            context: ./api/.
+            dockerfile: Dockerfile
+        volumes: 
+            - ./api/app:/var/www/app
+            - ./api/resources:/var/www/resources
+            - ./api/routes:/var/www/routes
+            - ./api/storage:/var/www/storage
+            - ./api/database:/var/www/database
+        command: php artisan --host=0.0.0.0 serve
+        ports:
+            - "5006:8000"
+        environment: 
+            #===========================>> JWT
+            JWT_SECRET: MTO7OmBzXhbPI2bErLjV9XEFbpCn3MHCPxKdcBxiFHjuWJirIayTB9npa4cGNAFX
+
+            #==========================>> DB Config
+            DB_CONNECTION: mysql
+            DB_HOST: mysql #DB_HOST
+            DB_PORT: 3306
+            DB_DATABASE: minimart
+            DB_USERNAME: root
+            DB_PASSWORD: secret
+
+            #==========================>> FILE
+            FILE_URL: http://file:5009
+
+        networks: 
+            - camcyber
+
+    #==============================================>> File
+    file: 
+        container_name: pos-file-v1  
+        build: 
+            context: ./file/.
+            dockerfile: Dockerfile
+        volumes: 
+            - ./file/public:/var/www/public
+        command: php artisan --host=0.0.0.0 serve
+        ports:
+            - "5007:8000"
+        networks: 
+            - camcyber
+    
+    #==============================================>> Report Generator
+    report: 
+        image: jsreport/jsreport
+        container_name: pos-report-v1
+        ports:
+            - "5005:5488"
+        networks:
+            - camcyber
+    
+    #==============================================>> Web
+    web: 
+        container_name: pos-web-v1
+        build:
+            context: ./web/.
+            dockerfile: Dockerfile
+        ports:
+            - "5008:80"
+        networks: 
+            - camcyber
+
+networks: 
+    camcyber:
