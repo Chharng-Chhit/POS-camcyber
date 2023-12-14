@@ -1,0 +1,28 @@
+<div mat-dialog-title class="custom-dialog-title">
+    <span class="text-2xl font-semibold">បង្កើតប្រភេទផលិតផលថ្មី</span>
+</div>
+
+<mat-dialog-content class="custom-dialog-content">
+    <form [formGroup]="create" #createNgForm="ngForm">
+        <div class="custom-form w-full min-h-18">
+            <mat-form-field appearance="outline" class="w-full mb-2">
+                <mat-label>ប្រភេទផលិតផល</mat-label>
+                <input id="name" matInput [formControlName]="'name'">
+                <mat-error class="min-h-6 mt-2.5 text-md" *ngIf="create.get('name').hasError('required')">
+                    សូមបញ្ចូលប្រភេទផលិតផល
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="center" class="custom-dialog-actions">
+    <button class="min-w-8 max-w-8 rounded-md custom-button" mat-flat-button [disabled]="create.invalid  || saving"
+    (click)="submit()">
+        <mat-icon *ngIf="!create.disabled" class="icon-size-6 text-white" svgIcon="mat_solid:create"></mat-icon>
+        <mat-progress-spinner *ngIf="create.disabled"[diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
+    </button>
+    <button class="min-w-8 max-w-8 rounded-md" mat-flat-button [mat-dialog-close]="false" color="warn" [disabled]="saving">
+        <mat-icon class="icon-size-6 text-white" [svgIcon]="'heroicons_solid:x'"></mat-icon>
+    </button>
+</mat-dialog-actions>
